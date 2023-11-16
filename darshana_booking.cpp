@@ -14,6 +14,19 @@ struct Booking {
     string specialDarshan;
 };
 
+// Function to update the "bookings.txt" file with the current bookings
+void updateBookingsFile(const vector<Booking>& bookings) {
+    ofstream outFile("bookings.txt");
+    if (outFile.is_open()) {
+        for (const Booking& booking : bookings) {
+            outFile << booking.name << "," << booking.date << "," << booking.time << "," << booking.price << "," << booking.specialDarshan << endl;
+        }
+        outFile.close();
+    } else {
+        cout << "Error: Unable to open the file for writing." << endl;
+    }
+}
+
 // Function to book a slot
 void bookSlot(vector<Booking>& bookings) {
     do {
@@ -113,6 +126,64 @@ void displayBookedSlots(const vector<Booking>& bookings) {
     }
 }
 
+// Function to delete a booking
+void deleteBooking(vector<Booking>& bookings) {
+    string name, date;
+    cout << "Enter the name of the person whose booking you want to delete: ";
+    cin.ignore();
+    getline(cin,name);
+    cout << "Enter the date of the booking to be deleted (DD/MM/YYYY): ";
+    cin >> date;
+
+    for (auto it = bookings.begin(); it != bookings.end(); ++it) {
+        if (it->name == name && it->date == date) {
+            bookings.erase(it);
+            cout << "Booking deleted successfully!" << endl;
+            updateBookingsFile(bookings); // Update the "bookings.txt" file
+            return;
+        }
+    }
+
+    cout << "Booking not found. No changes made." << endl;
+}
+
+// Function to search for bookings based on criteria
+void searchBookings(const vector<Booking>& bookings) {
+    int searchChoice;
+    cout << "Search for bookings by:" << endl;
+    cout << "1. Name" << endl;
+    cout << "2. Date" << endl;
+    cout << "Enter your choice (1-2): ";
+    cin >> searchChoice;
+
+    if (searchChoice == 1) {
+        string name;
+        cout << "Enter the name to search for: ";
+        cin.ignore();
+        getline(cin, name);
+
+        cout << "Matching bookings by name:" << endl;
+        for (const Booking& booking : bookings) {
+            if (booking.name == name) {
+                cout << "Name: " << booking.name << ", Date: " << booking.date << ", Time: " << booking.time << ", Special Darshan: " << booking.specialDarshan << ", Price: " << booking.price << " Rupees" << endl;
+            }
+        }
+    } else if (searchChoice == 2) {
+        string date;
+        cout << "Enter the date to search for (DD/MM/YYYY): ";
+        cin >> date;
+
+        cout << "Matching bookings by date:" << endl;
+        for (const Booking& booking : bookings) {
+            if (booking.date == date) {
+                cout << "Name: " << booking.name << ", Date: " << booking.date << ", Time: " << booking.time << ", Special Darshan: " << booking.specialDarshan << ", Price: " << booking.price << " Rupees" << endl;
+            }
+        }
+    } else {
+        cout << "Invalid search choice. Please try again." << endl;
+    }
+}
+
 int main() {
     vector<Booking> bookings;
 
@@ -154,7 +225,9 @@ int main() {
         cout << "Temple Darshana Booking System" << endl;
         cout << "1. Book a slot" << endl;
         cout << "2. Display booked slots" << endl;
-        cout << "3. Exit" << endl;
+        cout << "3. Delete a booking" << endl;
+        cout << "4. Search for bookings" << endl;
+        cout << "5. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -166,12 +239,18 @@ int main() {
                 displayBookedSlots(bookings);
                 break;
             case 3:
+                deleteBooking(bookings);
+                break;
+            case 4:
+                searchBookings(bookings);
+                break;
+            case 5:
                 cout << "Goodbye!" << endl;
                 break;
             default:
                 cout << "Invalid choice. Please try again." << endl;
         }
-    } while (choice != 3);
+    } while (choice != 5);
 
     return 0;
 }
